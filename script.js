@@ -1,5 +1,5 @@
 // NASA APOD API endpoint with API key
-const API_KEY = 'bjnYhxeq2HaklxVX8Lt5nwbXxFwoUz4JVLKC2wQE';
+const API_KEY = import.meta.env.VITE_NASA_API_KEY || 'DEMO_KEY';
 const API_URL = `https://api.nasa.gov/planetary/apod?api_key=${API_KEY}`;
 
 // Elements
