@@ -1,110 +1,59 @@
-// NASA APOD API endpoint with API key
 const API_KEY = 'bjnYhxeq2HaklxVX8Lt5nwbXxFwoUz4JVLKC2wQE';
 const API_URL = `https://api.nasa.gov/planetary/apod?api_key=${API_KEY}`;
 
-// Elements
-const loading = document.getElementById('loading');
-const mainContent = document.getElementById('main-content');
-const content = document.getElementById('content');
-const error = document.getElementById('error');
-const image = document.getElementById('apod-image');
-const date = document.getElementById('apod-date');
-const title = document.getElementById('apod-title');
-const description = document.getElementById('apod-description');
-const previousYears = document.getElementById('previous-years');
-const gridContainer = document.getElementById('grid-container');
+const $ = id => document.getElementById(id);
 
-// Fetch APOD data
 async function fetchAPOD() {
     try {
-        const response = await fetch(API_URL);
+        const res = await fetch(API_URL);
+        if (!res.ok) throw new Error('Failed to fetch');
         
-        if (!response.ok) {
-            throw new Error('Failed to fetch data');
-        }
+        const data = await res.json();
         
-        const data = await response.json();
+        $('apod-image').src = data.url;
+        $('apod-image').alt = data.title;
+        $('apod-date').textContent = data.date;
+        $('apod-title').textContent = data.title;
+        $('apod-description').textContent = data.explanation;
         
-        // Update UI
-        image.src = data.url;
-        image.alt = data.title;
-        date.textContent = data.date;
-        title.textContent = data.title;
-        description.textContent = data.explanation;
+        $('loading').classList.add('hidden');
+        $('main-content').classList.remove('hidden');
         
-        // Show content, hide loading
-        loading.classList.add('hidden');
-        mainContent.classList.remove('hidden');
-        
-        // Fetch previous years
         fetchPreviousYears(data.date);
-        
     } catch (err) {
-        console.error('Error fetching APOD:', err);
-        loading.classList.add('hidden');
-        error.classList.remove('hidden');
+        console.error('Error:', err);
+        $('loading').classList.add('hidden');
+        $('error').classList.remove('hidden');
     }
 }
 
-// Fetch previous years on this date
 async function fetchPreviousYears(currentDate) {
     const [year, month, day] = currentDate.split('-');
-    const currentYear = parseInt(year);
-    const startYear = 1995; // APOD started in June 1995
+    const years = Array.from({length: parseInt(year) - 1995}, (_, i) => parseInt(year) - 1 - i);
     
-    // Generate array of previous years
-    const years = [];
-    for (let y = currentYear - 1; y >= startYear; y--) {
-        years.push(y);
-    }
+    $('previous-years').classList.remove('hidden');
     
-    // Show the section immediately
-    previousYears.classList.remove('hidden');
-    
-    // Fetch and display each year as it loads
     for (let i = 0; i < years.length; i++) {
-        const y = years[i];
-        const dateStr = `${y}-${month}-${day}`;
+        const dateStr = `${years[i]}-${month}-${day}`;
         
-        fetch(`https://api.nasa.gov/planetary/apod?api_key=${API_KEY}&date=${dateStr}`)
+        fetch(`${API_URL}&date=${dateStr}`)
             .then(res => res.ok ? res.json() : null)
-            .then(data => {
-                if (data) {
-                    displayGridItem(data);
-                }
-            })
-            .catch(err => console.error(`Error fetching ${dateStr}:`, err));
+            .then(data => data && displayGridItem(data))
+            .catch(err => console.error(`Error ${dateStr}:`, err));
         
-        // Small delay between requests
-        if (i < years.length - 1) {
-            await new Promise(resolve => setTimeout(resolve, 100));
-        }
+        if (i < years.length - 1) await new Promise(r => setTimeout(r, 100));
     }
 }
 
-// Display a single grid item
 function displayGridItem(item) {
-    const gridItem = document.createElement('div');
-    gridItem.className = 'grid-item';
-    
-    const img = document.createElement('img');
-    img.src = item.url;
-    img.alt = item.title;
-    
-    const yearDiv = document.createElement('div');
-    yearDiv.className = 'year';
-    yearDiv.textContent = item.date.split('-')[0];
-    
-    const titleDiv = document.createElement('div');
-    titleDiv.className = 'grid-title';
-    titleDiv.textContent = item.title;
-    
-    gridItem.appendChild(img);
-    gridItem.appendChild(yearDiv);
-    gridItem.appendChild(titleDiv);
-    
-    gridContainer.appendChild(gridItem);
+    const div = document.createElement('div');
+    div.className = 'grid-item';
+    div.innerHTML = `
+        <img src="${item.url}" alt="${item.title}">
+        <div class="year">${item.date.split('-')[0]}</div>
+        <div class="grid-title">${item.title}</div>
+    `;
+    $('grid-container').appendChild(div);
 }
 
-// Load APOD on page load
 fetchAPOD();
