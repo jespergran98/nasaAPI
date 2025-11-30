@@ -18,5 +18,5 @@ NOTATER:
 
 Enkel stil, svart bakgrunn med stjerne particles.
 
-Astronomy Picture of the Day seksjonen fyller 100svh,
+Astronomy Picture of the Day seksjonen fyller 100svh.
 
