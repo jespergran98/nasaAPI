@@ -66,6 +66,26 @@ h1 {
     display: none;
 }
 
+#back-to-today {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #fff;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: 1.5rem;
+    align-self: flex-start;
+    margin-left: 1rem;
+}
+
+#back-to-today:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
+    transform: translateX(-3px);
+}
+
 #main-content {
     display: flex;
     flex-direction: column;
@@ -129,10 +149,16 @@ h2 {
 .grid-item {
     cursor: pointer;
     transition: transform 0.2s;
+    position: relative;
 }
 
 .grid-item:hover {
     transform: translateY(-5px);
+}
+
+.grid-item.active {
+    opacity: 0.5;
+    pointer-events: none;
 }
 
 .grid-item img {
